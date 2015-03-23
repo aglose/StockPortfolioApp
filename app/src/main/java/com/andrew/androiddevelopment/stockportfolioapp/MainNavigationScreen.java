@@ -84,7 +84,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
             boolean badUserInput = checkForBadStock(stockInfo);
 
             if(duplicate){
-                Toast.makeText(getApplicationContext(), "This stock already exists in your Portfolio", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "This stock already exists in your Portfolio.", Toast.LENGTH_SHORT).show();
             }else if(badUserInput){
                 Toast.makeText(getApplicationContext(), "The stock you entered does not exist", Toast.LENGTH_SHORT).show();
             }else{
