@@ -34,7 +34,6 @@ public class StockCardFragment extends Fragment {
         StockCardFragment fragment = new StockCardFragment();
         Bundle args = new Bundle();
 
-
         fragment.setArguments(args);
         return fragment;
     }

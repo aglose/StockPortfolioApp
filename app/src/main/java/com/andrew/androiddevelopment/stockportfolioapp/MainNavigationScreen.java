@@ -3,12 +3,14 @@ package com.andrew.androiddevelopment.stockportfolioapp;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -32,6 +34,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -48,10 +53,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainNavigationScreen extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, StockCardFragment.OnFragmentInteractionListener {
@@ -64,6 +71,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_navigation_screen);
 
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -71,7 +79,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
-    Handler showContent = new Handler(new Handler.Callback() {
+    Handler createNewStock = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             JSONObject stockInfo = (JSONObject) msg.obj;
@@ -109,6 +117,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
     }
 
     private boolean checkForDuplicateStock(JSONObject stockInfo) {
+        stocksForView = mNavigationDrawerFragment.getStockItems();
         for (JSONObject stocks: stocksForView){
             try {
                 if(stocks.get("Name").toString().equalsIgnoreCase(stockInfo.getString("Name"))){
@@ -192,6 +201,41 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+        SharedPreferences appSharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        Gson gson = new Gson();
+        SharedPreferences.Editor prefsEditor = appSharedPrefs.edit();
+//        prefsEditor.remove("SavedStocks");
+//        prefsEditor.commit();
+        String stocksJson = appSharedPrefs.getString("SavedStocks", "");
+        ArrayList<JSONObject> stocksList = gson.fromJson(stocksJson, new TypeToken<ArrayList<JSONObject>>(){}.getType());
+
+        if(stocksList != null){
+            if(stocksList.size() != 0){
+                Log.d("Debug onStart", stocksList.get(0).getClass().getName());
+                mNavigationDrawerFragment.setStockItems(stocksList);
+            }
+
+        }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        SharedPreferences appSharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor prefsEditor = appSharedPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(stocksForView, new TypeToken<ArrayList<JSONObject>>(){}.getType());
+        prefsEditor.putString("SavedStocks", json);
+        prefsEditor.commit();
+        if(stocksForView.size() != 0) {
+            Log.d("Debug onStop", stocksForView.get(0).toString());
+        }
+    }
 
     @Override
     public void onFragmentInteraction(Uri uri) {

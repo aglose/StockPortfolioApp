@@ -2,6 +2,7 @@ package com.andrew.androiddevelopment.stockportfolioapp;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ public class StockCardAdapter extends BaseAdapter {
     private TextView stockDayLow;
     private TextView stockDayHigh;
 
-    public StockCardAdapter(Context c, ArrayList stockList) {
+    public StockCardAdapter(Context c, ArrayList<JSONObject> stockList) {
         this.stockList = stockList;
         context = c;
     }
@@ -50,7 +51,6 @@ public class StockCardAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View list;
-
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
@@ -62,6 +62,7 @@ public class StockCardAdapter extends BaseAdapter {
             stockDayLow  = (TextView) list.findViewById(R.id.stockDayLowText);
             stockDayHigh  = (TextView) list.findViewById(R.id.stockDayHighText);
 
+            Log.d("Debug stockCardAdapter", stockList.get(position).toString());
             JSONObject stock = stockList.get(position);
 
             try {

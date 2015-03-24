@@ -1,5 +1,6 @@
 package com.andrew.androiddevelopment.stockportfolioapp;
 
+import android.content.Context;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
@@ -26,17 +27,23 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -64,7 +71,9 @@ public class NavigationDrawerFragment extends Fragment {
 
     private Button stockButton;
 
-    private ArrayList<JSONObject> stockList = new ArrayList<>();
+    private ArrayList<JSONObject> stockList = new ArrayList<>();;
+
+    private StockCardAdapter adapter;
     private Menu menu;
 
     public NavigationDrawerFragment() {
@@ -83,6 +92,7 @@ public class NavigationDrawerFragment extends Fragment {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
+
 
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
@@ -106,17 +116,22 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-//        ArrayList<String> sections = getActivity().
+
+        adapter = new StockCardAdapter(getActivity().getApplicationContext(), stockList);
+        mDrawerListView.setAdapter(adapter);
 
 
-
-        mDrawerListView.setAdapter(new StockCardAdapter(getActivity().getApplicationContext(), stockList));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
 
     public void addStockItem(JSONObject stock){
         stockList.add(stock);
+        adapter.notifyDataSetChanged();
+    }
+    public void setStockItems(ArrayList stocks){
+        stockList = stocks;
+        mDrawerListView.setAdapter(new StockCardAdapter(getActivity().getApplicationContext(), stockList));
     }
 
     public ArrayList getStockItems(){
@@ -234,6 +249,7 @@ public class NavigationDrawerFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -276,88 +292,85 @@ public class NavigationDrawerFragment extends Fragment {
         stockButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Thread loadContent = new Thread(){
-                    @Override
-                    public void run(){
-                        if (((MainNavigationScreen)getActivity()).isNetworkActive()){
-                            InputStream is = null;
-                            String result = "";
-                            JSONObject jArray = null;
 
-                            try{
-                                String url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22"+searchText.getText().toString().trim()+"%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-                                HttpClient httpclient = new DefaultHttpClient();
-                                HttpPost httppost = new HttpPost(url);
-                                HttpResponse response = httpclient.execute(httppost);
-                                HttpEntity entity = response.getEntity();
-                                is = entity.getContent();
-
-                            }catch(Exception e){
-                                Log.e("log_tag", "Error in http connection " + e.toString());
-                            }
-
-                            // Convert response to string
-                            try{
-                                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-                                StringBuilder sb = new StringBuilder();
-                                String line = null;
-                                while ((line = reader.readLine()) != null) {
-                                    sb.append(line + "\n");
-                                }
-                                is.close();
-                                result=sb.toString();
-                            }catch(Exception e){
-                                Log.e("log_tag", "Error converting result "+e.toString());
-                            }
-
-                            try{
-                                jArray = new JSONObject(result);
-                                JSONObject finalResult = jArray.getJSONObject("query").getJSONObject("results").getJSONObject("quote");
-
-                                Message msg = Message.obtain();
-                                msg.obj = finalResult;
-                                ((MainNavigationScreen)getActivity()).showContent.sendMessage(msg);
-
-                            }catch(JSONException e){
-                                Log.e("log_tag", "Error parsing data "+e.toString());
-                            }
-//                            URL url = null;
-//                            try {
-//                                String baseUrl = "http://query.yahooapis.com/v1/public/yql?q=";
-//                                String query = "select * from yahoo.finance.quote where symbol in (\""+editText.getText().toString().trim()+"\")";
-//
-//                                String fullUrlStr = baseUrl + query + "&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
-//
-//                                String stockURL = "http://finance.yahoo.com/webservice/v1/symbols/"+searchText.getText().toString().trim()+"/quote?format=json";
-//                                url = new URL(stockURL);
-//
-//                                BufferedReader reader = new BufferedReader( new InputStreamReader(url.openStream()));
-//
-//                                String response = "", tmpResponse = "";
-//
-//                                tmpResponse = reader.readLine();
-//                                while (tmpResponse != null){
-//                                    response = response + tmpResponse;
-//                                    tmpResponse = reader.readLine();
-//                                }
-//
-//                                JSONObject responseJSON = new JSONObject(response);
-//                                JSONObject listItems = responseJSON.getJSONObject("list").getJSONArray("resources").getJSONObject(0).getJSONObject("resource").getJSONObject("fields");
-
-//                                Message msg = Message.obtain();
-//                                msg.obj = listItems;
-//                                ((MainNavigationScreen)getActivity()).showContent.sendMessage(msg);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-                        }
-                    }
-                };
-                loadContent.start();
+                pollForStocksThread(searchText.getText().toString());
             };
         });
     }
 
+    public void pollForStocksThread(String newItem){
+        final String newStock = newItem.trim();
+        Thread loadContent = new Thread(){
+            @Override
+            public void run(){
+                if (((MainNavigationScreen)getActivity()).isNetworkActive()){
+                    InputStream is = null;
+                    String result = "";
+                    String fullQuery = "%22"+newStock+"%22";
+
+                    JSONObject jArray = null;
+
+                    try{
+                        for(JSONObject stock: stockList){
+                            String stockSymbol = (String) stock.get("symbol");
+                            if(stockSymbol != null){
+                                fullQuery += "%2C%22"+stockSymbol+"%22";
+                            }
+                        }
+                        Log.d("Debug Thread", fullQuery);
+                        String url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20("+fullQuery+")&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+                        Log.d("Debug Thread", url);
+                        Log.d("Debug Thread", "char at: "+String.valueOf(url.charAt(118)));
+                        HttpClient httpclient = new DefaultHttpClient();
+                        HttpPost httppost = new HttpPost(url);
+                        HttpResponse response = httpclient.execute(httppost);
+                        HttpEntity entity = response.getEntity();
+                        is = entity.getContent();
+
+                    }catch(Exception e){
+                        Log.e("log_tag", "Error in http connection " + e.toString());
+                    }
+
+                    // Convert response to string
+                    try{
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+                        StringBuilder sb = new StringBuilder();
+                        String line = null;
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line + "\n");
+                        }
+                        is.close();
+                        result=sb.toString();
+                    }catch(Exception e){
+                        Log.e("log_tag", "Error converting result "+e.toString());
+                    }
+
+                    try{
+                        jArray = new JSONObject(result);
+                        JSONObject results = jArray.getJSONObject("query").getJSONObject("results");
+
+                        int i = 0;
+                        if(results.get("quote") instanceof JSONArray){
+                            JSONArray quotesArray = jArray.getJSONObject("query").getJSONObject("results").getJSONArray("quote");
+                            while(quotesArray.getJSONObject(i) != null){
+                                Message msg = Message.obtain();
+                                msg.obj = quotesArray.getJSONObject(i);
+                                ((MainNavigationScreen)getActivity()).createNewStock.sendMessage(msg);
+                                i++;
+                            }
+                        }else{
+                            Message msg = Message.obtain();
+                            msg.obj = results.get("quote");
+                            ((MainNavigationScreen)getActivity()).createNewStock.sendMessage(msg);
+                        }
+                    }catch(JSONException e){
+                        Log.e("log_tag", "Error parsing data "+e.toString());
+                    }
+                }
+            }
+        };
+        loadContent.start();
+    }
     /**
      * Per the navigation drawer design guidelines, updates the action bar to show the global app
      * 'context', rather than just what's in the current screen.
@@ -372,8 +385,6 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBar getActionBar() {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
-
-
 
     /**
      * Callbacks interface that all activities using this fragment must implement.
