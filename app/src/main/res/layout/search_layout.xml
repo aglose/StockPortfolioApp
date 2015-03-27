@@ -2,19 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:focusableInTouchMode="true">
 
-    <EditText
-        android:id="@+id/txt_search"
-        android:inputType="text"
+
+    <AutoCompleteTextView
+        android:focusable="true"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
+        android:id="@+id/autoCompleteTextView"
         />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Stock"
-        android:id="@+id/getStockButton"
-        android:layout_gravity="center_horizontal" />
 
+    <Button
+        android:id="@+id/getStockButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Search"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:textSize="24sp"/>
 </LinearLayout>

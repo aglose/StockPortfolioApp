@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="myPrimaryColor">#6257FF</color>
+    <color name="myPrimaryDarkColor">#1B1843</color>
+    <color name="myAccentColor">#57A0FF</color>
+    <color name="myDrawerBackground">#FFFFFF</color>
+    <color name="myWindowBackground">#FFFFFF</color>
+    <color name="myTextPrimaryColor">#FFFFFF</color>
+    <color name="myNavigationColor">#FFB757</color>
+    <color name="selected_gray">#E3EDFE</color>
+    <color name="blue">#57A0FF</color>
+    <color name="grey">#F2F2F2</color>
+    <color name="white">#FFFFFF</color>
+    <color name="toast_bg_transparent">#E6000000</color>
+    <color name="lovely_row_bg1">#E3EDFE</color>
+    <color name="lovely_row_bg2">#FFFFFF</color>
+    <color name="background_recycler">#F2F2F2</color>
+    <color name="delete_buttom">#D0D0D0</color>
+</resources>

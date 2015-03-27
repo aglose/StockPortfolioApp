@@ -49,13 +49,32 @@ public class StockCardAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View list;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            list = inflater.inflate(R.layout.fragment_stock_card, null);
-            stockTitle  = (TextView) list.findViewById(R.id.stockTitleText);
+            list = inflater.inflate(R.layout.stock_card_layout, null);
+
+            list.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    TextView removeThis = (TextView) v.findViewById(R.id.stockNameText);
+                    Log.d("Debug","Long Press Delete "+removeThis.getText().toString());
+                    ((MainNavigationScreen)context).onSectionAttached(-1);
+                    return false;
+                }
+            });
+            list.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NavigationDrawerFragment mNavigationDrawerFragment = (NavigationDrawerFragment)
+                            ((MainNavigationScreen)context).getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+                    Log.d("Debug", "short press");
+                }
+            });
+            stockTitle  = (TextView) list.findViewById(R.id.stockNameText);
             stockSymbol  = (TextView) list.findViewById(R.id.stockSymbolText);
             stockPrice  = (TextView) list.findViewById(R.id.stockPriceText);
             stockChange  = (TextView) list.findViewById(R.id.stockChangeText);

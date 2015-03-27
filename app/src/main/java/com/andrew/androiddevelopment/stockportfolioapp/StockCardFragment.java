@@ -4,15 +4,11 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 
 /**
@@ -24,17 +20,13 @@ import org.w3c.dom.Text;
  * create an instance of this fragment.
  */
 public class StockCardFragment extends Fragment {
-
-
-
-
     private OnFragmentInteractionListener mListener;
 
     public static StockCardFragment newInstance(JSONObject stockInfo) {
         StockCardFragment fragment = new StockCardFragment();
         Bundle args = new Bundle();
-
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -53,7 +45,7 @@ public class StockCardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_stock_card, container, false);
+        View v = inflater.inflate(R.layout.stock_card_layout, container, false);
 
         return v;
     }

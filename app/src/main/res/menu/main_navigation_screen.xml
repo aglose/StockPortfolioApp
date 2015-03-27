@@ -2,9 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainNavigationScreen">
 
-    <item android:id="@+id/action_search" android:title="Search"
+    <item android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_search"
+        android:title="Search"
+        app:actionLayout="@layout/search_layout"
         app:showAsAction="ifRoom|collapseActionView"
-        app:actionLayout="@layout/search_layout" />
+        />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>
