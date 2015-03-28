@@ -1,4 +1,4 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items;
 
 /**
  * Created by Andrew on 3/26/2015.
@@ -11,6 +11,7 @@ public class StockItem {
     private String daysLow = "";
     private String price = "";
     private String lastTradePriceOnly = "";
+    private String fullName = "";
 
     public long getId(){
         return 0;
@@ -44,10 +45,13 @@ public class StockItem {
         this.lastTradePriceOnly = lastTradePriceOnly;
     }
 
+    public String getFullName(){
+        return fullName;
+    }
     public void setName(String name) {
+        this.fullName = name;
         String localName = name;
         if(name.length() > 10){
-            int i = name.length();
             StringBuilder myName = new StringBuilder(name);
             String newString = myName.substring(0, 11);
             StringBuilder finalString = new StringBuilder(newString);

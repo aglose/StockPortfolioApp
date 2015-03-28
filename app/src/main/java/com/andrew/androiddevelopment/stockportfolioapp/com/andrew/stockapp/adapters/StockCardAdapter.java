@@ -1,4 +1,4 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,6 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
+import com.andrew.androiddevelopment.stockportfolioapp.NavigationDrawerFragment;
+import com.andrew.androiddevelopment.stockportfolioapp.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

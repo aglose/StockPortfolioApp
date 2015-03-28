@@ -1,18 +1,20 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers;
 
-import android.graphics.Color;
 import android.util.Log;
+
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.StockItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by Andrew on 3/26/2015.
  */
 public class StockItemManager {
+
+
     private ArrayList<StockItem> stockList;
 
     public StockItemManager(){

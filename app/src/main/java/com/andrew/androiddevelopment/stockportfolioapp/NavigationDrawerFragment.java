@@ -17,13 +17,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
 
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
 import org.apache.http.HttpEntity;
@@ -52,7 +51,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
     private View mFragmentContainerView;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
-    private RecyclerAdapter adapter;
+    private StockCardFragment.RecyclerAdapter adapter;
     private RecyclerView wrappedAdapter;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
     private AutoCompleteTextView searchText;
@@ -85,7 +84,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
         mDrawerRecyclerView.setHasFixedSize(true);
         mDrawerRecyclerView.setLayoutManager(layoutManager);
 
-        adapter = new RecyclerAdapter(getActivity(), getStockItemManager());
+        adapter = new StockCardFragment.RecyclerAdapter(getActivity(), getStockItemManager());
 //        wrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(adapter);
         adapter.setNavigationCallbacks(this);
         mDrawerRecyclerView.setAdapter(adapter);
@@ -209,7 +208,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
 
                         int i = 0;
                         if(results.get("quote") instanceof JSONArray){
-                            JSONArray quotesArray = jArray.getJSONObject("query").getJSONObject("results").getJSONArray("quote");
+                            JSONArray quotesArray = results.getJSONArray("quote");
                             while(quotesArray.length() != i){
                                 Message msg = Message.obtain();
                                 msg.obj = quotesArray.getJSONObject(i);
@@ -321,7 +320,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
         if (mCallbacks != null) {
             mCallbacks.onItemSelected(position);
         }
-        ((RecyclerAdapter) mDrawerRecyclerView.getAdapter()).setSelectedRow(position);
+        ((StockCardFragment.RecyclerAdapter) mDrawerRecyclerView.getAdapter()).setSelectedRow(position);
     }
 
     @Override

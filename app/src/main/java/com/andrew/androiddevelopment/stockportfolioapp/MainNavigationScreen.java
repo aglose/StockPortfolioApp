@@ -3,72 +3,48 @@ package com.andrew.androiddevelopment.stockportfolioapp;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.SearchManager;
-import android.app.SearchableInfo;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.NewsCardAdapter;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks.ChartImageDownloaderTask;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks.StockNewsDownloaderTask;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.StockItem;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.listeners.OnSwipeTouchListener;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockNewsManager;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainNavigationScreen extends ActionBarActivity implements NavigationCallbacks {
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private Toolbar mToolbar;
-    private static StockItemManager stockItemManager = new StockItemManager();;
-    private static ArrayList<PlaceholderFragment> fragments = new ArrayList<>();
+    static Toolbar mToolbar;
+    private static StockItemManager stockItemManager = new StockItemManager();
+    private static StockNewsManager stockNewsManager = new StockNewsManager();
     private TextView menuTitle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +54,6 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mNavigationDrawerFragment.initDrawer(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
@@ -137,6 +111,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
+            Toast.makeText(this, "No Network Access", Toast.LENGTH_SHORT).show();
             return false;
         }
     }
@@ -150,7 +125,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         }else{
             Log.d("Debug number ", String.valueOf(number));
             StockItem stock = stockItemManager.getStockItem(number);
-            menuTitle.setText(stock.getName());
+            menuTitle.setText(stock.getFullName());
         }
     }
 
@@ -237,7 +212,7 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
     public void onNavigationDrawerItemSelected(int position) {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position))
+                .replace(R.id.container, MainScreenStockFragment.newInstance(position))
                 .commit();
         //I CHANGED THE POSITION FROM POSITION + 1
     }
@@ -249,83 +224,133 @@ public class MainNavigationScreen extends ActionBarActivity implements Navigatio
         this.stockItemManager = stockItemManager;
     }
 
-    public static class PlaceholderFragment extends Fragment {
+    public StockNewsManager getStockNewsManager() {
+        return stockNewsManager;
+    }
+    public void setStockNewsManager(StockNewsManager stockNewsManager) {
+        this.stockNewsManager = stockNewsManager;
+    }
+
+    public static class MainScreenStockFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";
-        ImageView imageView;
+
+        private RecyclerView newsListRecycler;
+        private NewsCardAdapter newsCardAdapter;
+
+        private ImageView imageView;
+
+        private ChartImageDownloaderTask imageDownloader;
+        private StockNewsDownloaderTask stockNewsDownloader;
+
+        private static final String chartArray[] = new String[]{"1d","3d", "1w", "1m", "6m", "1y"};
+        public static Drawable[] chartImages = new Drawable[8];
+        int position = 0;
 
 
-        public static void refreshFragments(){
-            for(PlaceholderFragment frags: fragments){
-                int currentSection = frags.getArguments().getInt(ARG_SECTION_NUMBER);
-                Bundle newArgs = new Bundle();
-                newArgs.putInt(ARG_SECTION_NUMBER, --currentSection);
-                frags.setArguments(newArgs);
-            }
-        }
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static MainScreenStockFragment newInstance(int sectionNumber) {
+            MainScreenStockFragment fragment = new MainScreenStockFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
 
-            if(sectionNumber >= 0){
-                fragments.add(fragment);
-            }
-
             return fragment;
         }
 
-        public PlaceholderFragment() {
+        public MainScreenStockFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_navigation_screen, container, false);
+
             imageView = (ImageView) rootView.findViewById(R.id.stockChartView);
+            applyTouchListener(imageView);
+
+            newsListRecycler = (RecyclerView) rootView.findViewById(R.id.newsList);
+            newsCardAdapter = new NewsCardAdapter(getActivity(), stockNewsManager);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+            newsListRecycler.setAdapter(newsCardAdapter);
+            newsListRecycler.setHasFixedSize(true);
+            newsListRecycler.setLayoutManager(layoutManager);
+
             int position = getArguments().getInt(ARG_SECTION_NUMBER);
-            Log.d("Debug stockChart ", String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
             if(position >= 0){
                 while(position >= stockItemManager.getCount()){
                     position--;
                 }
                 getStockChart(position);
+                getStockNews(position, rootView);
             }
             return rootView;
         }
 
-        Handler showChart = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                Drawable stockChart = (Drawable) msg.obj;
-                imageView.setImageDrawable(stockChart);
-                return false;
-            }
-        });
+        private void applyTouchListener(final ImageView imageView) {
+            imageView.setOnTouchListener(new OnSwipeTouchListener(getActivity()) {
+                @Override
+                public void onSwipeDown() {
+                }
+                @Override
+                public void onSwipeLeft() {
+                    if(position < 6){
+                        imageView.setImageDrawable(chartImages[position++]);
+                    }
+                    if(position > 5){
+                        position = 6;
+                    }
+                    Toast.makeText(getActivity(), "Left "+String.valueOf(position), Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onSwipeUp() {
+                }
+                @Override
+                public void onSwipeRight() {
+                    if(position >= 0){
+                        imageView.setImageDrawable(chartImages[position--]);
+                    }
+                    if(position < 0){
+                        position = 0;
+                    }
+                    Toast.makeText(getActivity(), "Right "+String.valueOf(position), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         private void getStockChart(final int position){
-            if(stockItemManager.getCount() > 0 ){
-                Thread loadContent = new Thread(){
-                    @Override
-                    public void run(){
-                        try {
-                            StockItem stockSymbol = stockItemManager.getStockItem(position);
-                            String stockURL = "https://chart.yahoo.com/z?t=NASDAQ%20&s="+stockSymbol.getSymbol();
-
-                            InputStream stream = (InputStream) new URL(stockURL).getContent();
-                            Drawable chart = Drawable.createFromStream(stream, "chart pic");
-
-                            Message msg = Message.obtain();
-                            msg.obj = chart;
-                            showChart.sendMessage(msg);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+            if(stockItemManager.getCount() > 0 ) {
+                StockItem stockSymbol = stockItemManager.getStockItem(position);
+                String urls[] = new String[6];
+                for (int i = 0; i < 6; i++) {
+                    String stockURL = "https://chart.yahoo.com/z?t=" + chartArray[i] + "%20&s=" + stockSymbol.getSymbol();
+                    urls[i] = stockURL;
+                }
+                if(((MainNavigationScreen)getActivity()).isNetworkActive()){
+                    imageDownloader = new ChartImageDownloaderTask(chartImages, new ChartImageDownloaderTask.ImageLoaderListener() {
+                        @Override
+                        public void onImagesDownloaded(Drawable[] chartImagesUpdated) {
+                            chartImages = chartImagesUpdated;
+                            imageView.setImageDrawable(chartImages[0]);
                         }
-                    }
-                };
-                loadContent.start();
+                    }, imageView);
+                    imageDownloader.execute(urls);
+                }
             }
+        }
 
+        private void getStockNews(final int position, final View rootView){
+
+            if(stockItemManager.getCount() > 0 ) {
+                StockItem stockSymbol = stockItemManager.getStockItem(position);
+                final String symbol = stockSymbol.getSymbol();
+                String stockNewsURL = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20google.news%20where%20q%20%3D%20%22"+symbol+"%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+
+                if(((MainNavigationScreen)getActivity()).isNetworkActive()){
+                    stockNewsDownloader = new StockNewsDownloaderTask(getActivity(), rootView, symbol);
+                    stockNewsDownloader.execute(stockNewsURL);
+                }
+            }
         }
 
         @Override

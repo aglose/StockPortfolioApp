@@ -15,10 +15,13 @@
 
     <Button
         android:id="@+id/getStockButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Search"
-        android:drawableLeft="@android:drawable/ic_menu_search"
-        android:textSize="24sp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/rounded_corners_item"
+        android:text="Add to Portfolio"
+        android:textSize="10dp"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="7dp" />
 </LinearLayout>

@@ -17,13 +17,14 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             android:minHeight="@dimen/abc_action_bar_default_height_material"
-            android:theme="@android:style/ThemeOverlay.Material.Dark.ActionBar">
+            >
 
             <TextView
                 android:id="@+id/menuTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="italic"
+                android:textSize="15dp"
                 android:text="TestTitle"/>
 
         </android.support.v7.widget.Toolbar>
