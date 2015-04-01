@@ -1,4 +1,4 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
+import com.andrew.androiddevelopment.stockportfolioapp.NavigationCallbacks;
+import com.andrew.androiddevelopment.stockportfolioapp.R;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
 
 import org.json.JSONObject;

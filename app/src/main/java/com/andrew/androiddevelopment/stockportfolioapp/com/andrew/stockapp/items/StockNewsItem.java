@@ -1,5 +1,7 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items;
 
+import android.util.Log;
+
 import org.w3c.dom.Node;
 
 import java.io.StringWriter;
@@ -21,7 +23,10 @@ public class StockNewsItem {
     private String articleTitle = "";
     private String articleContent = "";
     private String articleURL = "";
+    private String articleFullURL = "";
     private String publisher = "";
+    private String imageURL = "";
+    private String publishedDate = "";
 
     public String getPublisher() {
         return publisher;
@@ -38,9 +43,9 @@ public class StockNewsItem {
     public void setArticleContent(String articleContent) {
         String localContent;
 
-        if(articleContent.length() > 200){
+        if(articleContent.length() > 300){
             StringBuilder myName = new StringBuilder(articleContent);
-            String newString = myName.substring(0, 202);
+            String newString = myName.substring(0, 300);
             StringBuilder finalString = new StringBuilder(newString);
             finalString.append("...");
             localContent = finalString.toString();
@@ -56,9 +61,17 @@ public class StockNewsItem {
 
     public void setArticleURL(String articleURL) {
         String localURL = "";
-        if(articleURL.length() > 30){
+        String colon = "\u00253A";
+        String forwardslash = "\u00252F";
+
+        articleURL = articleURL.replaceAll(colon, ":");
+        articleURL = articleURL.replaceAll(forwardslash, "/");
+
+        setArticleFullURL(articleURL);
+
+        if(articleURL.length() > 40){
             StringBuilder myName = new StringBuilder(articleURL);
-            String newString = myName.substring(0, 32);
+            String newString = myName.substring(0, 40);
             StringBuilder finalString = new StringBuilder(newString);
             finalString.append("...");
             localURL = finalString.toString();
@@ -68,6 +81,14 @@ public class StockNewsItem {
         this.articleURL = localURL;
     }
 
+    public String getArticleFullURL() {
+        return articleFullURL;
+    }
+
+    public void setArticleFullURL(String articleFullURL) {
+        this.articleFullURL = articleFullURL;
+    }
+
     public String getArticleTitle() {
         return articleTitle;
     }
@@ -75,8 +96,12 @@ public class StockNewsItem {
     public void setArticleTitle(String articleTitle) {
         String localTitle = "";
         if(articleTitle.length() > 30){
+            String apostrophe = "&#39;";
+            Log.d("Debug string", apostrophe);
+            articleTitle = articleTitle.replaceAll(apostrophe, "'");
+
             StringBuilder myName = new StringBuilder(articleTitle);
-            String newString = myName.substring(0, 32);
+            String newString = myName.substring(0, 30);
             StringBuilder finalString = new StringBuilder(newString);
             finalString.append("...");
             localTitle = finalString.toString();
@@ -84,5 +109,26 @@ public class StockNewsItem {
             localTitle = articleTitle;
         }
         this.articleTitle = localTitle;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setPublisherDate(String publishedDate) {
+
+        StringBuilder myName = new StringBuilder(publishedDate);
+        int index = myName.indexOf(":");
+        String choppedDate = myName.substring(0, index-3);
+
+        this.publishedDate = choppedDate;
+    }
+
+    public String getPublisherDate() {
+        return publishedDate;
     }
 }

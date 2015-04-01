@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.CardView
@@ -12,15 +11,29 @@
         android:id="@+id/card_view"
         android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        card_view:cardElevation="3dp"
-        card_view:cardCornerRadius="4dp"
+        android:layout_height="160dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+
+        card_view:cardElevation="2dp"
+        card_view:cardCornerRadius="2dp"
         card_view:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="3dp">
+            android:padding="4dp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/relativeLayout">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:id="@+id/imageView"
+                android:layout_gravity="center_horizontal"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -28,17 +41,20 @@
                 android:text="News Article Title"
                 android:id="@+id/newsArticleTitleText"
                 android:textColor="@color/black"
-                android:layout_alignParentTop="true"
+                android:layout_below="@+id/imageView"
                 android:layout_alignParentStart="true" />
 
             <WebView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="News Article Content"
+                android:clickable="true"
                 android:id="@+id/newsArticleContentText"
                 android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"
                 android:layout_below="@+id/newsArticleTitleText"
                 android:layout_alignStart="@+id/newsArticleTitleText" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,9 +62,10 @@
                 android:text="News Article Link"
                 android:id="@+id/newsArticleLinkText"
                 android:textColor="@color/black"
-                android:layout_alignTop="@+id/newsArticlePublisherText"
-                android:layout_alignStart="@+id/newsArticleContentText"
-                android:layout_marginStart="8dp" />
+                android:layout_gravity="center_horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,10 +73,23 @@
                 android:text="News Article Publisher"
                 android:id="@+id/newsArticlePublisherText"
                 android:textColor="@color/black"
+                android:layout_gravity="right"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="11dp"
+                android:id="@+id/dateOfArticleText"
+                android:text="Article Date"
+                android:textColor="@color/black"
+                android:textSize="8dp"
+                android:layout_alignTop="@+id/imageView"
+                android:layout_alignParentEnd="true" />
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
+
 
 </LinearLayout>

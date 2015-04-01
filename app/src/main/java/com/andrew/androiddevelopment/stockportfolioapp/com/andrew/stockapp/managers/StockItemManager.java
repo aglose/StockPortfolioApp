@@ -108,4 +108,8 @@ public class StockItemManager {
     public int undoLastRemoval(){
         return 0;
     }
+
+    public void setStockItemList(ArrayList<StockItem> stockItemList) {
+        this.stockList = stockItemList;
+    }
 }

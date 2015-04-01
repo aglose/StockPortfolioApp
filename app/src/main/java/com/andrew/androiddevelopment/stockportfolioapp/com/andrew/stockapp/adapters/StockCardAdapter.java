@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
-import com.andrew.androiddevelopment.stockportfolioapp.NavigationDrawerFragment;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.NavigationDrawerFragment;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
 
 import org.json.JSONException;

@@ -19,6 +19,8 @@ public class StockNewsManager {
     static final String JSON_CONTENT = "content";
     static final String JSON_URL = "url";
     static final String JSON_PUBLISHER = "publisher";
+    static final String JSON_PUBLISHED_DATE = "publishedDate";
+    static final String JSON_IMAGE_URL = "url";
     private static final String XML_TITLE = "title";
     private static final String XML_CONTENT = "description";
     private static final String XML_URL = "link";
@@ -42,6 +44,8 @@ public class StockNewsManager {
             newStockNewsItem.setArticleContent(newsArticleJSON.getString(JSON_CONTENT));
             newStockNewsItem.setArticleURL(newsArticleJSON.getString(JSON_URL));
             newStockNewsItem.setPublisher(newsArticleJSON.getString(JSON_PUBLISHER));
+            newStockNewsItem.setPublisherDate(newsArticleJSON.getString(JSON_PUBLISHED_DATE));
+            newStockNewsItem.setImageURL(newsArticleJSON.getJSONObject("image").getString(JSON_IMAGE_URL));
         } catch (JSONException e) {
             e.printStackTrace();
         }

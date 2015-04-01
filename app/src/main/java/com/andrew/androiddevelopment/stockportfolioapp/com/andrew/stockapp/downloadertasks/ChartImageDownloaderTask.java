@@ -1,8 +1,23 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.andrew.androiddevelopment.stockportfolioapp.R;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.CropChartImages;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.ChartImageTabAdapter;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.SlidingTabLayout;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,15 +27,16 @@ import java.net.URL;
  * Created by Andrew on 3/27/2015.
  */
 public class ChartImageDownloaderTask extends AsyncTask<String, Void, Void>{
+    private Bitmap[] chartImages;
+    private ViewPager mViewPager;
+    private Activity activity;
+    private SlidingTabLayout mSlidingTabLayout;
 
-    private static Drawable[] chartImages;
-    private ImageLoaderListener listener;
-    private ImageView imageView;
-
-    public ChartImageDownloaderTask(Drawable[] chartImages, ImageLoaderListener listener, ImageView imageView){
+    public ChartImageDownloaderTask(Activity activity, Bitmap[] chartImages, ViewPager mViewPager, SlidingTabLayout mSlidingTabLayout){
         this.chartImages = chartImages;
-        this.listener = listener;
-        this.imageView = imageView;
+        this.mViewPager = mViewPager;
+        this.activity = activity;
+        this.mSlidingTabLayout = mSlidingTabLayout;
     }
 
     @Override
@@ -36,23 +52,21 @@ public class ChartImageDownloaderTask extends AsyncTask<String, Void, Void>{
     }
     @Override
     protected void onPostExecute(Void result) {
-        imageView.setImageDrawable(chartImages[0]);
+        mViewPager.setAdapter(new ChartImageTabAdapter(activity, chartImages));
+        mSlidingTabLayout.setViewPager(mViewPager);
     }
 
-    public interface ImageLoaderListener {
-        void onImagesDownloaded(Drawable[] chartImages);
-    }
-
-    public static void getStockChartDrawable(String url, int i){
-
-
+    public void getStockChartDrawable(String url, int i){
         InputStream stream = null;
         try {
             stream = (InputStream) new URL(url).getContent();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Drawable chart = Drawable.createFromStream(stream, "chart pic");
-        chartImages[i] = chart;
+        Bitmap chart = BitmapFactory.decodeStream(stream);
+        int x = 512;
+        int y = 226;
+        Bitmap result = Bitmap.createBitmap(chart, 0, 0, x, y);
+        chartImages[i] = result;
     }
 }

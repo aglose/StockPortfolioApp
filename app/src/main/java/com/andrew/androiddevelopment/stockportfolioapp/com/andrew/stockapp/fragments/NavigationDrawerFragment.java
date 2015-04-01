@@ -1,4 +1,4 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments;
 
 import android.content.Context;
 import android.os.Message;
@@ -22,6 +22,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
+import com.andrew.androiddevelopment.stockportfolioapp.DividerItemDecoration;
+import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
+import com.andrew.androiddevelopment.stockportfolioapp.NavigationCallbacks;
+import com.andrew.androiddevelopment.stockportfolioapp.R;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
@@ -52,8 +56,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private StockCardFragment.RecyclerAdapter adapter;
-    private RecyclerView wrappedAdapter;
-    private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
     private AutoCompleteTextView searchText;
     private Button stockButton;
 
@@ -101,7 +103,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
         adapter.addItem(index);
     }
     public void notifyAdapterOfRemovedStock(int position){
-        int index = getStockItemManager().getCount();
         adapter.removeItem(position);
     }
 
@@ -159,7 +160,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
                     pollForStocksThread(searchText.getText().toString());
                     searchText.setText("");
                 }
-            };
+            }
         });
 
 

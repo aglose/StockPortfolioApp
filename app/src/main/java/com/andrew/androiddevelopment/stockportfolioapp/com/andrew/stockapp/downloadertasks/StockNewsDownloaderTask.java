@@ -1,14 +1,22 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks;
 
+import android.app.FragmentManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.AsyncTask;
+import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.Switch;
+import android.widget.TextView;
 
+import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.NewsCardAdapter;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.MainStockNewsDisplayFragment;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockNewsManager;
 
 import org.apache.http.HttpEntity;
@@ -49,6 +57,8 @@ public class StockNewsDownloaderTask  extends AsyncTask<String, Void, Void> {
     private RecyclerView newsListRecycler;
     private NewsCardAdapter newsCardAdapter;
     private static String symbol;
+    private String newsSource = null;
+    private String newsCopyright = null;
 
     public StockNewsDownloaderTask(Context context,  View rootView, String symbol){
         this.context = context;
@@ -59,83 +69,124 @@ public class StockNewsDownloaderTask  extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... url) {
         String query = url[0];
+        String preference = url[1];
 
-        getStockNews(query);
+        getStockNews(query, preference);
 
         return null;
     }
 
-    public interface NewsLoaderListener {
-        void onNewsDownloaded(StockNewsManager stockNewsManager);
+    protected void onProgressUpdate(Void... progress) {
+        TextView title = (TextView) rootView.findViewById(R.id.companyTitleNewsText);
+        TextView copyright = (TextView) rootView.findViewById(R.id.copyrightText);
+
+
+        title.setText(newsSource);
+        copyright.setText(newsCopyright);
     }
+
 
     @Override
     protected void onPostExecute(Void result) {
+        FragmentManager fragmentManager = ((MainNavigationScreen) context).getFragmentManager();
+        MainStockNewsDisplayFragment fragment = (MainStockNewsDisplayFragment) fragmentManager.findFragmentByTag("Fragment");
+        fragment.crossfadeViews();
+
         newsListRecycler = (RecyclerView) rootView.findViewById(R.id.newsList);
         newsCardAdapter = new NewsCardAdapter(context, stockNewsManager);
         newsListRecycler.setAdapter(newsCardAdapter);
+
+        Switch aSwitch = (Switch) rootView.findViewById(R.id.switchNews);
+        aSwitch.setVisibility(View.VISIBLE);
+
     }
 
-    public void getStockNews(String query){
-        Log.d("Debug url", query);
-        try{
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(query);
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity entity = response.getEntity();
-            is = entity.getContent();
-        }catch(Exception e){
-            Log.e("log_tag", "Error in http connection " + e.toString());
-        }
-
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+    private void getStockNews(String query, String preference){
+        if(preference.equalsIgnoreCase("false")){
+            getYahooNews(symbol);
+        }else {
+            Log.d("Debug url", query);
+            try {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(query);
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                is = entity.getContent();
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
             }
-            is.close();
-            result=sb.toString();
-        }catch(Exception e){
-            Log.e("log_tag", "Error converting result "+e.toString());
-        }
 
-        try{
-            jArray = new JSONObject(result);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                is.close();
+                result = sb.toString();
+            } catch (Exception e) {
+                Log.e("log_tag", "Error converting result " + e.toString());
+            }
+
+            boolean googleNotWorking = false;
+
+            try {
+                jArray = new JSONObject(result);
+                googleNotWorking = Integer.valueOf(jArray.getJSONObject("query").getString("count").trim()) == 0;
+            } catch (JSONException e) {
+                Log.e("log_tag", "Error parsing data " + e.toString());
+            }
+
             Log.d("Debug jArray", jArray.toString());
+            Log.d("Debug jArray", preference);
 
-            if(Integer.valueOf(jArray.getJSONObject("query").getString("count").trim()) == 0) {
-                getAlternateNewsSource(symbol);
-            }else{
-                JSONObject results = jArray.getJSONObject("query").getJSONObject("results");
-                Log.d("Debug count", jArray.getJSONObject("query").getString("count"));
+            if (preference.equalsIgnoreCase("true")) {
+                if (googleNotWorking) {
+                    newsSource = context.getString(R.string.issueGoogleNews);
+                    newsCopyright = "";
+                    publishProgress();
+                } else {
+                    getGoogleNews();
+                }
+            } else {//TRY AND GET YAHOO NEWS
+                getYahooNews(symbol);
+            }
+        }
+    }
 
-                if(results.get("results") instanceof JSONArray){
-                    int i = 0;
-                    JSONArray quotesArray = results.getJSONArray("results");
-                    while(i != quotesArray.length()){
-                        JSONObject newsArticleJSON = quotesArray.getJSONObject(i);
-                        Log.d("Debug task", newsArticleJSON.toString());
-                        stockNewsManager.addStockNewsItem(newsArticleJSON);
-                        i++;
-                    }
-                }else if(results.get("results") != null){
-                    stockNewsManager.addStockNewsItem(results.getJSONObject("results"));
-                }else{
-                    Toast.makeText(context.getApplicationContext(), "This Stock Does not have any news associated with its symbol", Toast.LENGTH_SHORT).show();
+    private void getGoogleNews() {
+        newsSource = context.getString(R.string.googleNews);
+        newsCopyright = context.getString(R.string.copyrightGoogle);
+        publishProgress();
+        JSONObject results = null;
+
+        try {
+            results = jArray.getJSONObject("query").getJSONObject("results");
+
+            Log.d("Debug count", jArray.getJSONObject("query").getString("count"));
+
+            if(results.get("results") instanceof JSONArray){
+                int i = 0;
+                JSONArray quotesArray = results.getJSONArray("results");
+                while(i != quotesArray.length()){
+                    JSONObject newsArticleJSON = quotesArray.getJSONObject(i);
+                    Log.d("Debug task", newsArticleJSON.toString());
+                    stockNewsManager.addStockNewsItem(newsArticleJSON);
+                    i++;
                 }
             }
-
-        }catch(JSONException e){
-            Log.e("log_tag", "Error parsing data "+e.toString());
-            Toast.makeText(context.getApplicationContext(), "Issue Retrieving News", Toast.LENGTH_SHORT).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
-    private void getAlternateNewsSource(String symbol){
+
+    private void getYahooNews(String symbol){
+        newsSource = context.getString(R.string.yahooNews);
+        newsCopyright = context.getString(R.string.copyrightYahoo);
+        publishProgress();
         String url = "http://finance.yahoo.com/rss/headline?s="+symbol;
 
-        Log.d("Debug url 2", url);
         try{
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost(url);

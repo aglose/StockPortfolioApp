@@ -12,5 +12,22 @@
     <string name="action_settings">Settings</string>
     <string name="companyTitle">Getting Latest News for</string>
     <string name="copyrightGoogle">© 2015 Google Inc. All rights reserved.</string>
+    <string name="googleNews">Google News</string>
+    <string name="yahooNews">Yahoo! News</string>
+    <string name="copyrightYahoo">© 2015 Yahoo Inc. All rights reserved.</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="issueGoogleNews">Issue Retrieving Google News. Try Again Shortly.</string>
+    <string name="issueYahooNews">Issue Retrieving Yahoo! News. Try Again Shortly.</string>
+
+    <string-array name="chart_name_array">
+        <item>1 DAY</item>
+        <item>3 DAY</item>
+        <item>1 WEEK</item>
+        <item>1 MONTH</item>
+        <item>6 MONTHS</item>
+        <item>1 YEAR</item>
+    </string-array>
 
 </resources>
