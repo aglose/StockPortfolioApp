@@ -95,13 +95,13 @@ public class StockNewsItem {
 
     public void setArticleTitle(String articleTitle) {
         String localTitle = "";
-        if(articleTitle.length() > 30){
+        if(articleTitle.length() > 60){
             String apostrophe = "&#39;";
             Log.d("Debug string", apostrophe);
             articleTitle = articleTitle.replaceAll(apostrophe, "'");
 
             StringBuilder myName = new StringBuilder(articleTitle);
-            String newString = myName.substring(0, 30);
+            String newString = myName.substring(0, 60);
             StringBuilder finalString = new StringBuilder(newString);
             finalString.append("...");
             localTitle = finalString.toString();

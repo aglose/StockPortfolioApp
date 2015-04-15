@@ -6,7 +6,14 @@
     tools:context=".MainNavigationScreen"
     >
 
+    <FrameLayout
+        android:id="@+id/initial_news"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_marginTop="64dp"
+        tools:layout="@layout/fragment_regular_news_recycler"  />
+
     <LinearLayout
+        android:id="@+id/initial_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:weightSum="100"
@@ -63,5 +70,7 @@
         android:layout_gravity="start"
         android:name="com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.NavigationDrawerFragment"
         tools:layout="@layout/fragment_navigation_drawer" />
+
+
 
 </android.support.v4.widget.DrawerLayout>

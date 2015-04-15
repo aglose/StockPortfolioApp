@@ -71,4 +71,13 @@
     <color name="Red">#FF0000</color>
     <color name="OldLace">#FDF5E6</color>
     <color name="LightGoldenrodYellow">#FAFAD2</color>
+
+    <array name="colorWheel">
+        <item>@color/LightPink</item>
+        <item>@color/Orange</item>
+        <item>@color/LightSalmon</item>
+        <item>@color/DarkOrange</item>
+        <item>@color/Coral</item>
+        <item>@color/Tomato</item>
+    </array>
 </resources>

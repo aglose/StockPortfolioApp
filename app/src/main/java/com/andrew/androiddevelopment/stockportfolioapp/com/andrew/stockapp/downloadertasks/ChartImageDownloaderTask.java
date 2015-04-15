@@ -1,23 +1,13 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.CropChartImages;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.ChartImageTabAdapter;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.SlidingTabLayout;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
 import java.io.IOException;
 import java.io.InputStream;

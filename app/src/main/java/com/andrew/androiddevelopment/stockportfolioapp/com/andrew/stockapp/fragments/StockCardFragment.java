@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,19 +18,11 @@ import android.widget.Toast;
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.NavigationCallbacks;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.PortfolioManager;
 
 import org.json.JSONObject;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link StockCardFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StockCardFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StockCardFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
@@ -85,16 +78,6 @@ public class StockCardFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
@@ -109,11 +92,11 @@ public class StockCardFragment extends Fragment {
         private int mTouchedPosition = -1;
         private NavigationCallbacks mNavigationCallbacks;
         private static final String TAG = "MyDraggableItemAdapter";
-        private StockItemManager stockItemManager;
+        private PortfolioManager portfolioManager;
 
-        public RecyclerAdapter(Context context, StockItemManager stockItemManager) {
+        public RecyclerAdapter(Context context, PortfolioManager portfolioManager) {
             this.context = context;
-            this.stockItemManager = stockItemManager;
+            this.portfolioManager = portfolioManager;
         }
 
         public void setNavigationCallbacks(NavigationCallbacks navigationCallbacks) {
@@ -128,18 +111,18 @@ public class StockCardFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ListRecyclerHolder viewHolder, final int i) {
-                viewHolder.stockName.setText(String.valueOf(stockItemManager.getStockItem(i).getName()));
-                if (stockItemManager.getStockItem(i).getChange().toString().startsWith("+")) {
-                    viewHolder.stockPrice.setText(String.valueOf(stockItemManager.getStockItem(i).getLastTradePrice()));
+                viewHolder.stockName.setText(String.valueOf(portfolioManager.getStockItem(i).getName()));
+                if (portfolioManager.getStockItem(i).getChange().toString().startsWith("+")) {
+                    viewHolder.stockPrice.setText(String.valueOf(portfolioManager.getStockItem(i).getLastTradePrice()));
                     viewHolder.stockPrice.setTextColor(Color.GREEN);
                 } else {
-                    viewHolder.stockPrice.setText(String.valueOf(stockItemManager.getStockItem(i).getLastTradePrice()));
+                    viewHolder.stockPrice.setText(String.valueOf(portfolioManager.getStockItem(i).getLastTradePrice()));
                     viewHolder.stockPrice.setTextColor(Color.RED);
                 }
-                viewHolder.stockSymbol.setText(String.valueOf(stockItemManager.getStockItem(i).getSymbol()));
-                viewHolder.stockChange.setText(String.valueOf(stockItemManager.getStockItem(i).getChange()));
-                viewHolder.stockDayLow.setText(String.valueOf(stockItemManager.getStockItem(i).getDaysLow()));
-                viewHolder.stockDayHigh.setText(String.valueOf(stockItemManager.getStockItem(i).getDaysHigh()));
+                viewHolder.stockSymbol.setText(String.valueOf(portfolioManager.getStockItem(i).getSymbol()));
+                viewHolder.stockChange.setText(String.valueOf(portfolioManager.getStockItem(i).getChange()));
+                viewHolder.stockDayLow.setText(String.valueOf(portfolioManager.getStockItem(i).getDaysLow()));
+                viewHolder.stockDayHigh.setText(String.valueOf(portfolioManager.getStockItem(i).getDaysHigh()));
 
                 /* handle gestures and click events */
                 handleRowEvents(viewHolder.itemView, i);
@@ -167,31 +150,11 @@ public class StockCardFragment extends Fragment {
             });
         }
         private void handleRowEvents(final View itemView, final int i) {
-
-    //        itemView.setOnTouchListener(new View.OnTouchListener() {
-    //                @Override
-    //                public boolean onTouch(View v, MotionEvent event) {
-    //
-    //                    switch (event.getAction()) {
-    //                        case MotionEvent.ACTION_DOWN:
-    //                            touchPosition(i);
-    //                            return false;
-    //                        case MotionEvent.ACTION_UP:
-    //                        case MotionEvent.ACTION_CANCEL:
-    //                            touchPosition(-1);
-    //                            return false;
-    //                        case MotionEvent.ACTION_MOVE:
-    //                            return false;
-    //                    }
-    //                    return true;
-    //                }
-    //            }
-    //        );
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.d("Debug", "short press");
-                    android.support.v4.app.FragmentManager fragmentManager = ((MainNavigationScreen) context).getSupportFragmentManager();
+                    FragmentManager fragmentManager = ((MainNavigationScreen) context).getSupportFragmentManager();
                     NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) fragmentManager.findFragmentById(R.id.navigation_drawer);
                     navigationDrawerFragment.selectRow(i);
                     ((MainNavigationScreen) context).onNavigationDrawerItemSelected(i);
@@ -207,18 +170,18 @@ public class StockCardFragment extends Fragment {
 
         public void removeItem(int position) {
             Log.d("Debug remove", String.valueOf(position));
-            android.support.v4.app.FragmentManager fragmentManager = ((MainNavigationScreen) context).getSupportFragmentManager();
+            FragmentManager fragmentManager = ((MainNavigationScreen) context).getSupportFragmentManager();
             NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) fragmentManager.findFragmentById(R.id.navigation_drawer);
-            stockItemManager = navigationDrawerFragment.getStockItemManager();
-            if(position >= stockItemManager.getCount()){
+            portfolioManager = navigationDrawerFragment.getStockItemManager();
+            if(position >= portfolioManager.getCount()){
                 position--;
-                stockItemManager.removeStock(position);
-                ((MainNavigationScreen) context).setStockItemManager(stockItemManager);
+                portfolioManager.removeStock(position);
+                ((MainNavigationScreen) context).setPortfolioManager(portfolioManager);
                 notifyItemRemoved(position);
                 Toast.makeText(context.getApplicationContext(), "Unable to delete", Toast.LENGTH_SHORT).show();
             }else{
-                stockItemManager.removeStock(position);
-                ((MainNavigationScreen) context).setStockItemManager(stockItemManager);
+                portfolioManager.removeStock(position);
+                ((MainNavigationScreen) context).setPortfolioManager(portfolioManager);
                 notifyItemRemoved(position);
                 notifyDataSetChanged();
             }
@@ -244,8 +207,7 @@ public class StockCardFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            /* Do null check to avoid NullPointerExceptions */
-            return stockItemManager != null ? stockItemManager.getCount() : 0;
+            return portfolioManager != null ? portfolioManager.getCount() : 0;
         }
 
     //    @Override

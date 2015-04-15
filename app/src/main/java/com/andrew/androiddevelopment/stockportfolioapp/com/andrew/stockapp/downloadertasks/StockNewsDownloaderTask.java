@@ -1,22 +1,18 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.AsyncTask;
-import android.support.v4.graphics.BitmapCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.NewsCardAdapter;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.StockNewsCardAdapter;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.MainStockNewsDisplayFragment;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.StockNewsDisplayFragment;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockNewsManager;
 
 import org.apache.http.HttpEntity;
@@ -55,7 +51,7 @@ public class StockNewsDownloaderTask  extends AsyncTask<String, Void, Void> {
     private StockNewsManager stockNewsManager = new StockNewsManager();
     private View rootView;
     private RecyclerView newsListRecycler;
-    private NewsCardAdapter newsCardAdapter;
+    private StockNewsCardAdapter stockNewsCardAdapter;
     private static String symbol;
     private String newsSource = null;
     private String newsCopyright = null;
@@ -80,7 +76,6 @@ public class StockNewsDownloaderTask  extends AsyncTask<String, Void, Void> {
         TextView title = (TextView) rootView.findViewById(R.id.companyTitleNewsText);
         TextView copyright = (TextView) rootView.findViewById(R.id.copyrightText);
 
-
         title.setText(newsSource);
         copyright.setText(newsCopyright);
     }
@@ -88,13 +83,13 @@ public class StockNewsDownloaderTask  extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
-        FragmentManager fragmentManager = ((MainNavigationScreen) context).getFragmentManager();
-        MainStockNewsDisplayFragment fragment = (MainStockNewsDisplayFragment) fragmentManager.findFragmentByTag("Fragment");
+        FragmentManager fragmentManager = ((MainNavigationScreen) context).getSupportFragmentManager();
+        StockNewsDisplayFragment fragment = (StockNewsDisplayFragment) fragmentManager.findFragmentByTag("StockNewsFragment");
         fragment.crossfadeViews();
 
         newsListRecycler = (RecyclerView) rootView.findViewById(R.id.newsList);
-        newsCardAdapter = new NewsCardAdapter(context, stockNewsManager);
-        newsListRecycler.setAdapter(newsCardAdapter);
+        stockNewsCardAdapter = new StockNewsCardAdapter(context, stockNewsManager);
+        newsListRecycler.setAdapter(stockNewsCardAdapter);
 
         Switch aSwitch = (Switch) rootView.findViewById(R.id.switchNews);
         aSwitch.setVisibility(View.VISIBLE);

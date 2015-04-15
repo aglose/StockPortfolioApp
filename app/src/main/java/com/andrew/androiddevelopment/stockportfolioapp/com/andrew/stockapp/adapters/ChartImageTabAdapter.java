@@ -1,28 +1,32 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks.ChartImageDownloaderTask;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.StockItem;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
 
 /**
  * Created by Andrew on 4/1/2015.
  */
 public class ChartImageTabAdapter extends PagerAdapter {
     private Activity activity;
+    private Animator mCurrentAnimator;
 
-    private ImageView chart;
+    private int mShortAnimationDuration;
+
+    private ImageView chartSmall;
     private Bitmap[] chartImages;
 
     public ChartImageTabAdapter(Activity activity, Bitmap[] chartImages){
@@ -45,18 +49,19 @@ public class ChartImageTabAdapter extends PagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, final int position) {
         // Inflate a new layout from our resources
-        View view = activity.getLayoutInflater().inflate(R.layout.chart_item,
+        final View rootView = activity.getLayoutInflater().inflate(R.layout.chart_item,
                 container, false);
         // Add the newly created View to the ViewPager
-        container.addView(view);
+        container.addView(rootView);
 
-        chart = (ImageView) view.findViewById(R.id.stockChartView);
-        chart.setBackgroundResource(R.color.black);
-        chart.setImageBitmap(chartImages[position]);
+        rootView.setTranslationX(-1 * rootView.getWidth() * position);
+        chartSmall = (ImageView) rootView.findViewById(R.id.stockChartView);
+        chartSmall.setBackgroundResource(R.color.black);
+        chartSmall.setImageBitmap(chartImages[position]);
 
-        return view;
+        return rootView;
     }
 
     /**

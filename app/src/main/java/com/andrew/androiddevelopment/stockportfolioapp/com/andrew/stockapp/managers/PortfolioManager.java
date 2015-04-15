@@ -2,7 +2,7 @@ package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.mana
 
 import android.util.Log;
 
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.StockItem;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.PortfolioStockItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,43 +12,46 @@ import java.util.ArrayList;
 /**
  * Created by Andrew on 3/26/2015.
  */
-public class StockItemManager {
+public class PortfolioManager {
 
 
-    private ArrayList<StockItem> stockList;
+    private ArrayList<PortfolioStockItem> stockList = new ArrayList<>();
 
-    public StockItemManager(){
-        stockList = new ArrayList<>();
+    public PortfolioManager(){
     }
 
     public int getCount(){
-        return stockList.size();
+        if(stockList != null){
+            return stockList.size();
+        }else{
+            return 0;
+        }
     }
 
     public void addStockItem(JSONObject newStock){
-        StockItem newItem = createNewStockFromJSON(newStock);
+        PortfolioStockItem newItem = createNewStockFromJSON(newStock);
         stockList.add(newItem);
     }
 
-    private StockItem createNewStockFromJSON(JSONObject newStock){
-        StockItem newStockItem = new StockItem();
+    private PortfolioStockItem createNewStockFromJSON(JSONObject newStock){
+        PortfolioStockItem newPortfolioStockItem = new PortfolioStockItem();
         try {
-            newStockItem.setLastTradePrice(newStock.get("LastTradePriceOnly").toString());
-            newStockItem.setName(newStock.get("Name").toString());
-            newStockItem.setSymbol(newStock.get("Symbol").toString().toUpperCase());
-            newStockItem.setChange(newStock.get("Change").toString());
-            newStockItem.setDaysLow(newStock.get("DaysLow").toString());
-            newStockItem.setDaysHigh(newStock.get("DaysHigh").toString());
+            newPortfolioStockItem.setLastTradePrice(newStock.get("LastTradePriceOnly").toString());
+            newPortfolioStockItem.setName(newStock.get("Name").toString());
+            newPortfolioStockItem.setSymbol(newStock.get("Symbol").toString().toUpperCase());
+            newPortfolioStockItem.setChange(newStock.get("Change").toString());
+            newPortfolioStockItem.setDaysLow(newStock.get("DaysLow").toString());
+            newPortfolioStockItem.setDaysHigh(newStock.get("DaysHigh").toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return newStockItem;
+        return newPortfolioStockItem;
     }
 
     public String getAllStockSymbols(){
         String fullQuery = "";
-        for(StockItem stock: stockList){
-            String stockSymbol = (String) stock.getSymbol();
+        for(PortfolioStockItem stock: stockList){
+            String stockSymbol = stock.getSymbol();
             if(stockSymbol != null){
                 fullQuery += "%2C%22"+stockSymbol+"%22";
             }
@@ -57,7 +60,7 @@ public class StockItemManager {
     }
 
     public boolean checkForDuplicateStock(JSONObject stockInfo) {
-        StockItem updatedStock = createNewStockFromJSON(stockInfo);
+        PortfolioStockItem updatedStock = createNewStockFromJSON(stockInfo);
         for (int i=0;i<stockList.size();i++){
             if(stockList.get(i).getName().toString().equalsIgnoreCase(updatedStock.getName())){
                 Log.d("Debug ", "refreshed "+stockList.get(i).getName());
@@ -68,12 +71,12 @@ public class StockItemManager {
         return false;
     }
 
-    public StockItem getStockItem(int index){
+    public PortfolioStockItem getStockItem(int index){
         return stockList.get(index);
     }
 
-    public void setStockItem(int index, StockItem stockItem){
-        stockList.set(index, stockItem);
+    public void setStockItem(int index, PortfolioStockItem portfolioStockItem){
+        stockList.set(index, portfolioStockItem);
     }
 
     public void removeStock(int position){
@@ -91,8 +94,8 @@ public class StockItemManager {
         }
 
         for (int i=1; i <= Math.abs(distance);i++){
-            StockItem fromStock = getStockItem(fromPosition);
-            StockItem swapStock = getStockItem(fromPosition+direction);
+            PortfolioStockItem fromStock = getStockItem(fromPosition);
+            PortfolioStockItem swapStock = getStockItem(fromPosition+direction);
             stockList.set(fromPosition+(i*direction), fromStock);
             stockList.set(fromPosition, swapStock);
         }
@@ -102,14 +105,14 @@ public class StockItemManager {
         }
     }
 
-    public ArrayList<StockItem> getStockList(){
+    public ArrayList<PortfolioStockItem> getStockList(){
         return stockList;
     }
     public int undoLastRemoval(){
         return 0;
     }
 
-    public void setStockItemList(ArrayList<StockItem> stockItemList) {
-        this.stockList = stockItemList;
+    public void setStockItemList(ArrayList<PortfolioStockItem> portfolioStockItemList) {
+        this.stockList = portfolioStockItemList;
     }
 }

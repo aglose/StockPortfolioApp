@@ -26,8 +26,7 @@ import com.andrew.androiddevelopment.stockportfolioapp.DividerItemDecoration;
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.NavigationCallbacks;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.PortfolioManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -77,7 +76,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Debug ","inflated");
         View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -178,8 +176,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
                     JSONObject jArray = null;
 
                     try{
-                        fullQuery += getStockItemManager().getAllStockSymbols();
+                        if(getStockItemManager().getCount() > 1){
+                            fullQuery += getStockItemManager().getAllStockSymbols();
+                        }
                         String url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20("+fullQuery+")&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+                        Log.d("Debug url", url);
                         HttpClient httpclient = new DefaultHttpClient();
                         HttpPost httppost = new HttpPost(url);
                         HttpResponse response = httpclient.execute(httppost);
@@ -329,8 +330,8 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
 
     }
 
-    public StockItemManager getStockItemManager() {
-        return ((MainNavigationScreen) getActivity()).getStockItemManager();
+    public PortfolioManager getStockItemManager() {
+        return ((MainNavigationScreen) getActivity()).getPortfolioManager();
     }
 
     @Override

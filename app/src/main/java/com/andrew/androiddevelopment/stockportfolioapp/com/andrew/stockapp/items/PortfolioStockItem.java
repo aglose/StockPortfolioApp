@@ -3,7 +3,7 @@ package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.item
 /**
  * Created by Andrew on 3/26/2015.
  */
-public class StockItem {
+public class PortfolioStockItem {
     private String name = "";
     private String symbol = "";
     private String change = "";
