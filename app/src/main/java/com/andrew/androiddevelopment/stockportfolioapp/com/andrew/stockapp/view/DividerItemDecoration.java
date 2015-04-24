@@ -1,4 +1,4 @@
-package com.andrew.androiddevelopment.stockportfolioapp;
+package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

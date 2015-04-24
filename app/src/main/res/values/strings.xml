@@ -20,6 +20,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="issueGoogleNews">Issue Retrieving Google News. Try Again Shortly.</string>
     <string name="issueYahooNews">Issue Retrieving Yahoo! News. Try Again Shortly.</string>
+    <string name="action_home">Home</string>
+    <string name="foxbusiness">Fox Business</string>
+    <string name="cnn">CNN</string>
+    <string name="regularNewsTitle">Market News</string>
 
     <string-array name="chart_name_array">
         <item>1 DAY</item>

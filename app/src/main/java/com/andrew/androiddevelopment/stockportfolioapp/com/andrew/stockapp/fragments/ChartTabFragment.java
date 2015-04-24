@@ -1,23 +1,21 @@
 package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.adapters.ChartImageTabAdapter;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.downloadertasks.ChartImageDownloaderTask;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.StockItem;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.items.PortfolioStockItem;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.PortfolioManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockNewsManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.DepthPageTransformer;
 import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.SlidingTabLayout;
 
 /**
@@ -25,14 +23,20 @@ import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.
  */
 public class ChartTabFragment extends Fragment{
     int position;
-    private StockItemManager stockItemManager;
+    private PortfolioManager portfolioManager;
     public Bitmap[] chartImages = new Bitmap[8];
     private ChartImageDownloaderTask imageDownloader;
     private static final String CHART_ARRAY[] = new String[]{"1d","3d", "1w", "1m", "6m", "1y"};
 
-    public ChartTabFragment(StockItemManager stockItemManager, int position) {
-        this.stockItemManager = stockItemManager;
-        this.position = position;
+    public ChartTabFragment newInstance(PortfolioManager portfolioManager, int position) {
+        ChartTabFragment fragment = new ChartTabFragment();
+        fragment.setPosition(position);
+        fragment.setPortfolioManager(portfolioManager);
+
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     private SlidingTabLayout mSlidingTabLayout;
@@ -42,14 +46,14 @@ public class ChartTabFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.chart_slide_tab_layout, container, false);
+        return inflater.inflate(R.layout.fragment_chart_tab, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
-
+        mViewPager.setPageTransformer(true, new DepthPageTransformer());
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDividerColors(getActivity().getResources().getColor(R.color.delete_buttom));
         mSlidingTabLayout.setSelectedIndicatorColors(getActivity().getResources().getColor(R.color.bg_swipe_group_item_right));
@@ -57,8 +61,8 @@ public class ChartTabFragment extends Fragment{
     }
 
     private void getStockChart(){
-        if(stockItemManager.getCount() > 0 ) {
-            StockItem stockSymbol = stockItemManager.getStockItem(position);
+        if(portfolioManager.getCount() > 0 ) {
+            PortfolioStockItem stockSymbol = portfolioManager.getStockItem(position);
             String urls[] = new String[6];
             for (int i = 0; i < 6; i++) {
                 String stockURL = "https://chart.yahoo.com/z?t=" + CHART_ARRAY[i] + "&s=" + stockSymbol.getSymbol();
@@ -72,9 +76,11 @@ public class ChartTabFragment extends Fragment{
         }
     }
 
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
-
-
-
-
+    public void setPortfolioManager(PortfolioManager portfolioManager) {
+        this.portfolioManager = portfolioManager;
+    }
 }

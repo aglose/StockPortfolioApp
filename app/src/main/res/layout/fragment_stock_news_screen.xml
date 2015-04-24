@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lovely_row_bg1"
-    tools:context=".MainNavigationScreen$PlaceholderFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/stock_news_layout">
 
     <View
         android:layout_width="match_parent"
@@ -17,18 +17,31 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <Switch
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textOn="Google News"
-        android:layout_marginTop="3dp"
-        android:textSize="10dp"
-        android:textOff="Yahoo News"
-        android:id="@+id/switchNews"
-        android:onClick="onToggleClicked"
-        android:layout_gravity="center_horizontal" />
+        android:orientation="horizontal">
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New ToggleButton"
+            android:textOff="Charts"
+            android:textOn="Stock Info"
+            android:onClick="changeChartToggle"
+            android:id="@+id/chartToggleButton" />
 
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New ToggleButton"
+            android:textOff="Yahoo! News"
+            android:textOn="Google News"
+            android:onClick="switchNewsToggle"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/switchNewsButton" />
 
+        </RelativeLayout>
 
     <RelativeLayout
         android:layout_marginTop="1dp"
@@ -49,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:textSize="5dp"
+            android:textSize="6dp"
             android:id="@+id/copyrightText"
             android:layout_alignBottom="@+id/companyTitleNewsText"
             android:layout_alignParentEnd="true" />

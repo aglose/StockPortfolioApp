@@ -3,7 +3,7 @@ package com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.item
 /**
  * Created by Andrew on 3/26/2015.
  */
-public class StockItem {
+public class PortfolioStockItem {
     private String name = "";
     private String symbol = "";
     private String change = "";
@@ -12,6 +12,7 @@ public class StockItem {
     private String price = "";
     private String lastTradePriceOnly = "";
     private String fullName = "";
+    private String volume = "";
 
     public long getId(){
         return 0;
@@ -51,9 +52,9 @@ public class StockItem {
     public void setName(String name) {
         this.fullName = name;
         String localName = name;
-        if(name.length() > 10){
+        if(name.length() > 17){
             StringBuilder myName = new StringBuilder(name);
-            String newString = myName.substring(0, 11);
+            String newString = myName.substring(0, 17);
             StringBuilder finalString = new StringBuilder(newString);
             finalString.append("...");
             localName = finalString.toString();
@@ -105,4 +106,11 @@ public class StockItem {
         return daysLow;
     }
 
+    public String getVolume() {
+        return volume;
+    }
+
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
 }

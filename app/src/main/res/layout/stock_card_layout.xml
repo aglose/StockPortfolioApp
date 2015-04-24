@@ -3,28 +3,30 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
+    android:weightSum="100"
     >
 
-    <View
-        android:id="@+id/drag_handle"
-        android:layout_width="32dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:background="@color/delete_buttom" />
-
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="0dp"
+        android:layout_weight="80"
         android:layout_height="match_parent"
-        tools:context="com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.StockCardFragment"
+        tools:context="com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.fragments.PortfolioListFragment"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
         android:padding="5dp"
         android:paddingRight="5dp"
         android:paddingBottom="5dp"
-        android:background="@color/blue">
+        android:background="@color/blue"
+        >
 
-        <TextView android:layout_width="100dp"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/blue"
+            android:id="@+id/stockSelectArea"
+            />
+        <TextView android:layout_width="150dp"
             android:layout_height="50dp"
             android:text="Stock Name"
             android:id="@+id/stockNameText"
@@ -47,7 +49,8 @@
             android:text="symbol"
             android:id="@+id/stockSymbolText"
             android:layout_alignTop="@+id/stockNameText"
-            android:layout_toEndOf="@+id/stockChangeText" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="22dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -55,9 +58,8 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="% Change"
             android:id="@+id/stockChangeText"
-            android:layout_alignBaseline="@+id/stockPriceText"
-            android:layout_alignBottom="@+id/stockPriceText"
-            android:layout_toEndOf="@+id/stockNameText" />
+            android:layout_alignBottom="@+id/stockNameText"
+            android:layout_alignEnd="@+id/stockSymbolText" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -76,6 +78,36 @@
             android:id="@+id/stockDayHighText"
             android:layout_below="@+id/stockDayLowText"
             android:layout_alignStart="@+id/stockPriceText" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="20"
+        android:background="@color/lovely_row_bg1"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
+
+        <com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.VerticalTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Delete"
+            android:id="@+id/textView2"
+            android:textColor="@color/grey"
+            android:gravity="center_vertical"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkBox"
+            android:checked="false"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 </LinearLayout>

@@ -7,4 +7,9 @@ public interface NavigationCallbacks {
     void onItemSelected(int position);
 
     void onNavigationDrawerItemSelected(int position);
+
+    void itemChecked(int i);
+
+    void itemUnChecked(int i);
+
 }

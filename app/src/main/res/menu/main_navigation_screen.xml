@@ -8,6 +8,6 @@
         app:actionLayout="@layout/search_menu_layout"
         app:showAsAction="ifRoom|collapseActionView"
         />
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+    <item android:id="@+id/home" android:title="@string/action_home"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

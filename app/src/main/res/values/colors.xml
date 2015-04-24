@@ -9,7 +9,7 @@
     <color name="myNavigationColor">#FFB757</color>
     <color name="selected_gray">#E3EDFE</color>
     <color name="blue">#57A0FF</color>
-    <color name="grey">#F2F2F2</color>
+    <color name="grey">#9C9C9C</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#E6000000</color>
     <color name="lovely_row_bg1">#E3EDFE</color>
@@ -71,4 +71,13 @@
     <color name="Red">#FF0000</color>
     <color name="OldLace">#FDF5E6</color>
     <color name="LightGoldenrodYellow">#FAFAD2</color>
+
+    <array name="colorWheel">
+        <item>@color/LightPink</item>
+        <item>@color/Orange</item>
+        <item>@color/LightSalmon</item>
+        <item>@color/DarkOrange</item>
+        <item>@color/Coral</item>
+        <item>@color/Tomato</item>
+    </array>
 </resources>

@@ -22,12 +22,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
-import com.andrew.androiddevelopment.stockportfolioapp.DividerItemDecoration;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.view.DividerItemDecoration;
 import com.andrew.androiddevelopment.stockportfolioapp.MainNavigationScreen;
 import com.andrew.androiddevelopment.stockportfolioapp.NavigationCallbacks;
 import com.andrew.androiddevelopment.stockportfolioapp.R;
-import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.StockItemManager;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
+import com.andrew.androiddevelopment.stockportfolioapp.com.andrew.stockapp.managers.PortfolioManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -55,15 +54,15 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
     private View mFragmentContainerView;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
-    private StockCardFragment.RecyclerAdapter adapter;
+    private PortfolioListFragment.RecyclerAdapter adapter;
     private AutoCompleteTextView searchText;
     private Button stockButton;
-
+    private NavigationDrawerFragment navigationDrawerFragment;
     private int selectedPosition = 0;
     private int mCurrentSelectedPosition;
-
+    private boolean[] itemCheckedArray = new boolean[30];
     private boolean mUserLearnedDrawer;
-
+    private View rootView;
     public NavigationDrawerFragment() {
     }
 
@@ -77,16 +76,16 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Debug ","inflated");
-        View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        navigationDrawerFragment = this;
+        rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mDrawerRecyclerView = (RecyclerView) view.findViewById(R.id.drawerList);
+        mDrawerRecyclerView = (RecyclerView) rootView.findViewById(R.id.drawerList);
         mDrawerRecyclerView.setHasFixedSize(true);
         mDrawerRecyclerView.setLayoutManager(layoutManager);
 
-        adapter = new StockCardFragment.RecyclerAdapter(getActivity(), getStockItemManager());
+        adapter = new PortfolioListFragment.RecyclerAdapter(getActivity(), getStockItemManager());
 //        wrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(adapter);
         adapter.setNavigationCallbacks(this);
         mDrawerRecyclerView.setAdapter(adapter);
@@ -95,7 +94,31 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
 
         selectRow(mCurrentSelectedPosition);
 
-        return view;
+        setUpBatchDeleteButton();
+        return rootView;
+    }
+
+    private void setUpBatchDeleteButton() {
+        final Button deleteButton = (Button) rootView.findViewById(R.id.batchDeleteButton);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = itemCheckedArray.length-1; i >= 0; i--){
+                    if(itemCheckedArray[i] == true){
+                        itemCheckedArray[i] = false;
+                        notifyAdapterOfRemovedStock(i);
+                    }
+                }
+                PortfolioListFragment.RecyclerAdapter.unCheckAll = true;
+                adapter = new PortfolioListFragment.RecyclerAdapter(getActivity(), getStockItemManager());
+                adapter.setNavigationCallbacks(navigationDrawerFragment);
+                mDrawerRecyclerView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                deleteButton.setVisibility(View.INVISIBLE);
+                PortfolioListFragment.RecyclerAdapter.unCheckAll = false;
+
+            }
+        });
     }
 
     public void notifyAdapterOfNewStock(){
@@ -175,10 +198,13 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
                     String result = "";
                     String fullQuery = "%22"+newStock+"%22";
 
+
                     JSONObject jArray = null;
 
                     try{
-                        fullQuery += getStockItemManager().getAllStockSymbols();
+                        if(getStockItemManager().getCount() > 1){
+                            fullQuery += getStockItemManager().getAllStockSymbols();
+                        }
                         String url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20("+fullQuery+")&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
                         HttpClient httpclient = new DefaultHttpClient();
                         HttpPost httppost = new HttpPost(url);
@@ -321,7 +347,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
         if (mCallbacks != null) {
             mCallbacks.onItemSelected(position);
         }
-        ((StockCardFragment.RecyclerAdapter) mDrawerRecyclerView.getAdapter()).setSelectedRow(position);
+        ((PortfolioListFragment.RecyclerAdapter) mDrawerRecyclerView.getAdapter()).setSelectedRow(position);
     }
 
     @Override
@@ -329,12 +355,39 @@ public class NavigationDrawerFragment extends Fragment implements NavigationCall
 
     }
 
-    public StockItemManager getStockItemManager() {
-        return ((MainNavigationScreen) getActivity()).getStockItemManager();
+    public PortfolioManager getStockItemManager() {
+        return ((MainNavigationScreen) getActivity()).getPortfolioManager();
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
+    }
+
+    @Override
+    public void itemChecked(int i) {
+        itemCheckedArray[i] = true;
+        Button deleteButton = (Button) rootView.findViewById(R.id.batchDeleteButton);
+
+        if(deleteButton.getVisibility() != View.VISIBLE){
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void itemUnChecked(int i) {
+        itemCheckedArray[i] = false;
+        boolean keepButton = false;
+        Button deleteButton = (Button) rootView.findViewById(R.id.batchDeleteButton);
+
+        for (int j = 0; j<itemCheckedArray.length; j++){
+            if(itemCheckedArray[j] == true){
+                keepButton = true;
+                break;
+            }
+        }
+        if(!keepButton){
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
     }
 }
